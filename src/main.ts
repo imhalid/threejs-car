@@ -39,12 +39,22 @@ const obj = {
 const loader = new GLTFLoader()
 const dracoLoader = new DRACOLoader()
 const textureLoader = new THREE.TextureLoader()
+const cubeTextureLoader = new THREE.CubeTextureLoader()
 
 dracoLoader.setDecoderPath('/draco/')
 // texture.mapping = THREE.EquirectangularReflectionMapping
 loader.setDRACOLoader(dracoLoader)
 const bakedTexture = textureLoader.load('/area/bakinglast32denoise.jpg')
 bakedTexture.flipY = false
+
+const environmentMapTexture = cubeTextureLoader.load([
+  '/area/cube/px.png',
+  '/area/cube/nx.png',
+  '/area/cube/py.png',
+  '/area/cube/ny.png',
+  '/area/cube/pz.png',
+  '/area/cube/nz.png',
+])
 
 const bakedMaterial= new THREE.MeshStandardMaterial({map: bakedTexture})
 loader.load('/area/area1.glb', (gltf) => {
@@ -65,7 +75,7 @@ loader.load(
   function (gltf) {
     gltf.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        // child.material.envMap = envMap
+         child.material.envMap = environmentMapTexture
         if (child.material.name === 'body') {
           gui.addBinding(obj, 'color', { min: 0, max: 0xffffff, step: 1, view: 'color' }).on('change', (e) => {
             child.material.color.setHex(e.value)
@@ -129,7 +139,7 @@ const cube = new THREE.Mesh(geometry, material)
 cube.receiveShadow = true
 cube.castShadow = true
 cube.position.y = -0.25
-scene.add(cube)
+// scene.add(cube)
 
 camera.position.z = 5
 
