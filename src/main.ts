@@ -15,13 +15,13 @@ import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader'
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffff, 1)
-directionalLight.castShadow = true
-directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 15
-directionalLight.shadow.normalBias = 0.05
-directionalLight.position.set(2, 2, 2.25)
-scene.add(directionalLight)
+// const directionalLight = new THREE.DirectionalLight(0xffff, 1)
+// directionalLight.castShadow = true
+// directionalLight.shadow.mapSize.set(1024, 1024)
+// directionalLight.shadow.camera.far = 15
+// directionalLight.shadow.normalBias = 0.05
+// directionalLight.position.set(2, 2, 2.25)
+// scene.add(directionalLight)
 
 const rgbeLoader = new RGBELoader()
 
@@ -54,7 +54,7 @@ loader.load('/area/area1.glb', (gltf) => {
       child.material = bakedMaterial
     }
   })
-  // gltf.scene.scale.set(0.5, 0.5, 0.5)
+  gltf.scene.scale.set(0.5, 0.5, 0.5)
   scene.add(gltf.scene)
 })
 
@@ -89,7 +89,7 @@ loader.load(
     gltf.scene.receiveShadow = true
     gltf.scene.scale.set(1, 1, 1)
     // updateAllMaterials()
-    // scene.add(gltf.scene)
+    scene.add(gltf.scene)
   },
   function (xhr) {
     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
