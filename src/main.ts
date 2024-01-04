@@ -1,73 +1,86 @@
 import * as THREE from 'three'
 import { renderer, scene } from './core/renderer'
-import { fpsGraph } from './core/gui'
+import { fpsGraph, gui } from './core/gui'
 import camera from './core/camera'
 import background from './core/background'
 import { controls } from './core/orbit-control'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader'
 // Shaders
 // import vertexShader from './shaders/vertex.glsl'
 // import fragmentShader from './shaders/fragment.glsl'
 
 // Lights
-const ambientLight = new THREE.AmbientLight('0xffffff', 1)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight('0xffffff', 1)
+const directionalLight = new THREE.DirectionalLight(0xffff, 1)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
 directionalLight.shadow.normalBias = 0.05
-directionalLight.position.set(0.25, 2, 2.25)
+directionalLight.position.set(2, 2, 2.25)
 scene.add(directionalLight)
+
+const rgbeLoader = new RGBELoader()
+
+// const envMap = rgbeLoader.load('/hdr/studio.hdr', (texture) => {
+//   texture.mapping = THREE.EquirectangularReflectionMapping
+// })
+// scene.environment = envMap
+
+const obj = {
+  metalness: 1,
+  roughness: 0,
+  color: 0xe86e34,
+}
 
 const loader = new GLTFLoader()
 const dracoLoader = new DRACOLoader()
+const textureLoader = new THREE.TextureLoader()
 
 dracoLoader.setDecoderPath('/draco/')
-
+// texture.mapping = THREE.EquirectangularReflectionMapping
 loader.setDRACOLoader(dracoLoader)
+const bakedTexture = textureLoader.load('/area/bakinglast32denoise.jpg')
+bakedTexture.flipY = false
+
+const bakedMaterial= new THREE.MeshStandardMaterial({map: bakedTexture})
+loader.load('/area/area1.glb', (gltf) => {
+
+  gltf.scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.material = bakedMaterial
+    }
+  })
+  // gltf.scene.scale.set(0.5, 0.5, 0.5)
+  scene.add(gltf.scene)
+})
+
+
 loader.setResourcePath('/lambo/')
 loader.load(
   '/lambo/lambo.gltf',
   function (gltf) {
     gltf.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
+        // child.material.envMap = envMap
         if (child.material.name === 'body') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0x99ff })
+          gui.addBinding(obj, 'color', { min: 0, max: 0xffffff, step: 1, view: 'color' }).on('change', (e) => {
+            child.material.color.setHex(e.value)
+          })
+          child.material.color.setHex(obj.color)
+
           child.castShadow = true
           child.receiveShadow = true
         }
-        console.log(child.material.name)
-        if (child.material.name === 'material_46.001') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0xffffaa })
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-        if (child.material.name === 'windo.001') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0xffafff, opacity: 0.5, transparent: true })
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-        //doorline.002
-        if (child.material.name === 'doorline.002') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0x00aa00 })
+        if (child.material.name === 'windo.001' || child.material.name === 'headlight_glass.002') {
+          child.material = new THREE.MeshStandardMaterial({ color: 0x000000, opacity: 0.7, transparent: true })
           child.castShadow = true
           child.receiveShadow = true
         }
         //black_plastic.002
-        if (child.material.name === 'black_plastic.002') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0x0000aa })
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-        //tire.002 and tire_side.002
-        if (child.material.name === 'tire.002' || child.material.name === 'tire_side.002') {
-          child.material = new THREE.MeshStandardMaterial({ color: 0xa00000 })
-          child.castShadow = true
-          child.receiveShadow = true
-        }
         child.castShadow = true
         child.receiveShadow = true
       }
@@ -75,7 +88,8 @@ loader.load(
     gltf.scene.castShadow = true
     gltf.scene.receiveShadow = true
     gltf.scene.scale.set(1, 1, 1)
-    scene.add(gltf.scene)
+    // updateAllMaterials()
+    // scene.add(gltf.scene)
   },
   function (xhr) {
     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
@@ -84,6 +98,18 @@ loader.load(
     console.log('An error happened', error)
   }
 )
+
+const updateAllMaterials = () => {
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+      child.material.envMapIntensity = 3
+      child.material.needsUpdate = true
+      child.castShadow = true
+      child.receiveShadow = true
+    }
+  })
+}
+
 
 // Objects
 // const shaderMaterial = new THREE.ShaderMaterial({
@@ -108,7 +134,7 @@ scene.add(cube)
 camera.position.z = 5
 
 // const clock = new THREE.Clock()
-scene.add(background)
+// scene.add(background)
 
 const animate = () => {
   // const elapsedTime = clock.getElapsedTime()
