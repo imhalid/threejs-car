@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, AxesHelper, SRGBColorSpace, PCFShadowMap, ACESFilmicToneMapping, Color } from 'three'
+import { WebGLRenderer, Scene, AxesHelper, SRGBColorSpace, PCFShadowMap, ACESFilmicToneMapping, Color, WebGLCapabilities } from 'three'
 import { gui } from './gui'
 
 export const sizes = {
@@ -25,14 +25,6 @@ renderer.shadowMap.type = PCFShadowMap
 renderer.outputColorSpace = SRGBColorSpace
 renderer.toneMapping = ACESFilmicToneMapping
 renderer.toneMappingExposure = 1
-
-// Axes Helper
-const axesHelper = new AxesHelper()
-scene.add(axesHelper)
-
-gui.addBinding(axesHelper, 'visible', {
-  label: 'AxesHelper',
-})
 
 function updateRenderer() {
   renderer.setSize(sizes.width, sizes.height)
