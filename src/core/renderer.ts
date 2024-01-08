@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, AxesHelper, SRGBColorSpace, PCFShadowMap, ACESFilmicToneMapping, Color, WebGLCapabilities } from 'three'
+import { WebGLRenderer, Scene, SRGBColorSpace, PCFShadowMap, ACESFilmicToneMapping } from 'three'
 import { gui } from './gui'
 
 export const sizes = {
