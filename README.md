@@ -2,6 +2,10 @@
 
 vite-threejs-typescript-starter
 
+
+https://github.com/imhalid/threejs-car/assets/40598819/d00da76e-d7bc-4e53-94c4-b56f0459794e
+
+
 ## Description
 
 i clone this repo from [modern-three](https://github.com/alvarosabu/modern-three) thanks to [alvarosabu](https://github.com/alvarosabu)
